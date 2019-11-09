@@ -3,6 +3,7 @@ import glob
 import os
 import json
 import cv2
+from tqdm import tqdm
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -129,6 +130,22 @@ def process_and_augment_dataset():
     print("final array size", len(imgs_flat_array))
 
 
+def all_to_grayscale():
+    """ Converts all images to grayscale"""
+    imgs = glob.glob(os.path.join(ham_dir, "*.jpg"))
+    t = tqdm(total=len(imgs))
+    t.set_description("Converting to grayscale")
+    for i, img in enumerate(imgs):
+        img_filename = os.path.basename(img)
+        img_path = os.path.join(ham_dir, "grayscale", img_filename)
+        # print(f"saving at {img_path}")
+        img_array = cv2.imread(img)
+        img_gray = grayscale(img_array)
+        cv2.imwrite(img_path, img_gray)
+        t.update()
+    t.close()
+
+
 def check_all_same_resolution():
     # imgs = glob.glob("test_images/*.jpg")
     imgs = glob.glob("/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images_part_2/*.jpg")
@@ -173,7 +190,8 @@ def main():
     # crop_all_to_squares()
     # cv2.imwrite("squished.jpg", squish(cv2.imread("test_images/ISIC_0024306.jpg")))
     # create_lookup_dict()
-    process_and_augment_dataset()
+    # process_and_augment_dataset()
+    all_to_grayscale()
 
 
 if __name__ == '__main__':
