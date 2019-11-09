@@ -93,57 +93,42 @@ def crop_all_to_squares():
 
 def process_and_augment_dataset():
     metadata = pd.read_csv("HAM10000_metadata.csv")
-    imgs = glob.glob("/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images_part_2/*.jpg")
     count_dict = get_count_dict()
     lookup_dict = get_lookup_dict()
     target_no_imgs_per_dx = 3000
-    print(len(imgs))
-
-    # array to store processed image data
-    imgs_flat_array = []
 
     # augment each dx separately
-    for dx in dx_list:
+    for dx in dx_list[:1]:
         i = 0
-        dx_count = count_dict[dx]
         metadata_filtered = metadata[metadata["dx"] == dx]
-        # print(dx)
 
         # first pass: squish all
-        for index, row in metadata_filtered.iterrows():
-            img_id = row["image_id"]
-            assert row["dx"] == dx
-            img_path = os.path.join(ham_dir, f"{img_id}.jpg")
+        with open("edited.csv", "a+") as f:
+            t = tqdm(total=count_dict[dx])
+            t.set_description(f"Processing {dx} images")
+            for index, row in metadata_filtered.iterrows():
+                img_id = row["image_id"]
+                assert row["dx"] == dx
+                img_path = os.path.join(ham_dir, f"{img_id}.jpg")
 
-            # read and squish images
-            img_array = cv2.imread(img_path)
-            img_edited = np.ravel(resize(squish(grayscale(img_array))))
-            # print(img_edited)
-            # add img_id and dx as int
-            img_final = np.append(img_edited, [img_id, dx_ints[dx]])
-            # append to final array
-            imgs_flat_array.append(img_final)
-            i += 1
+                # read and squish images
+                img_array = cv2.imread(img_path)
+                img_array = np.ravel(resize(squish(grayscale(img_array))))
+                # print(img_edited)
+                # add img_id and dx as int
+                img_array = np.append(img_array, [img_id])
+                img_array = np.append(img_array, [dx_ints[dx]])
+                # append to final array
+                # imgs_flat_array.append(img_final)
+                # f.write(np.array2string(img_array, separator=","))
+                f.write(",".join(img_array))
+                f.write("\n")
+                del img_array
+                i += 1
+                t.update()
+            t.close()
 
         print(f"For dx {dx} processed {i} images")
-
-    print("final array size", len(imgs_flat_array))
-
-
-def all_to_grayscale():
-    """ Converts all images to grayscale"""
-    imgs = glob.glob(os.path.join(ham_dir, "*.jpg"))
-    t = tqdm(total=len(imgs))
-    t.set_description("Converting to grayscale")
-    for i, img in enumerate(imgs):
-        img_filename = os.path.basename(img)
-        img_path = os.path.join(ham_dir, "grayscale", img_filename)
-        # print(f"saving at {img_path}")
-        img_array = cv2.imread(img)
-        img_gray = grayscale(img_array)
-        cv2.imwrite(img_path, img_gray)
-        t.update()
-    t.close()
 
 
 def check_all_same_resolution():
@@ -190,8 +175,7 @@ def main():
     # crop_all_to_squares()
     # cv2.imwrite("squished.jpg", squish(cv2.imread("test_images/ISIC_0024306.jpg")))
     # create_lookup_dict()
-    # process_and_augment_dataset()
-    all_to_grayscale()
+    process_and_augment_dataset()
 
 
 if __name__ == '__main__':
