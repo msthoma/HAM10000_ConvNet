@@ -98,6 +98,9 @@ def process_and_augment_dataset():
     target_no_imgs_per_dx = 3000
     print(len(imgs))
 
+    # array to store processed image data
+    imgs_flat_array = []
+
     # augment each dx separately
     for dx in dx_list:
         i = 0
@@ -109,9 +112,21 @@ def process_and_augment_dataset():
         for index, row in metadata_filtered.iterrows():
             img_id = row["image_id"]
             assert row["dx"] == dx
-            img_path = os.path.join(ham_dir, img_id, ".jpg")
+            img_path = os.path.join(ham_dir, f"{img_id}.jpg")
 
+            # read and squish images
             img_array = cv2.imread(img_path)
+            img_edited = np.ravel(resize(squish(grayscale(img_array))))
+            # print(img_edited)
+            # add img_id and dx as int
+            img_final = np.append(img_edited, [img_id, dx_ints[dx]])
+            # append to final array
+            imgs_flat_array.append(img_final)
+            i += 1
+
+        print(f"For dx {dx} processed {i} images")
+
+    print("final array size", len(imgs_flat_array))
 
 
 def check_all_same_resolution():
