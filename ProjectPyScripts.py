@@ -3,6 +3,7 @@ import glob
 import os
 import json
 import cv2
+import time
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -98,14 +99,19 @@ def process_and_augment_dataset():
     target_no_imgs_per_dx = 3000
 
     # augment each dx separately
-    for dx in dx_list[:1]:
+    for dx in dx_list[:2]:
         i = 0
         metadata_filtered = metadata[metadata["dx"] == dx]
 
-        # first pass: squish all
+        if count_dict[dx] > target_no_imgs_per_dx:
+            total = count_dict[dx]
+        else:
+            total = target_no_imgs_per_dx
+
         with open("edited.csv", "a+") as f:
-            t = tqdm(total=count_dict[dx])
-            t.set_description(f"Processing {dx} images")
+            # first pass: squish all
+            t = tqdm(total=total)
+            t.set_description(f"Squishing {dx} images")
             for index, row in metadata_filtered.iterrows():
                 img_id = row["image_id"]
                 assert row["dx"] == dx
@@ -114,21 +120,44 @@ def process_and_augment_dataset():
                 # read and squish images
                 img_array = cv2.imread(img_path)
                 img_array = np.ravel(resize(squish(grayscale(img_array))))
-                # print(img_edited)
-                # add img_id and dx as int
+
+                # append img_id and dx as int
                 img_array = np.append(img_array, [img_id])
                 img_array = np.append(img_array, [dx_ints[dx]])
-                # append to final array
-                # imgs_flat_array.append(img_final)
-                # f.write(np.array2string(img_array, separator=","))
+
+                # append to final to file
                 f.write(",".join(img_array))
                 f.write("\n")
                 del img_array
                 i += 1
                 t.update()
-            t.close()
 
-        print(f"For dx {dx} processed {i} images")
+            if i < target_no_imgs_per_dx:
+                # second pass: crop square at random
+                t.set_description(f"Randomly cropping {dx} images")
+                for index, row in metadata_filtered.iterrows():
+                    if i > target_no_imgs_per_dx:
+                        break
+
+                    img_id = row["image_id"]
+                    assert row["dx"] == dx
+                    img_path = os.path.join(ham_dir, f"{img_id}.jpg")
+
+                    # read and squish images
+                    img_array = cv2.imread(img_path)
+                    img_array = np.ravel(resize(crop_square(grayscale(img_array))))
+
+                    # append img_id and dx as int
+                    img_array = np.append(img_array, [img_id])
+                    img_array = np.append(img_array, [dx_ints[dx]])
+
+                    # append to final to file
+                    f.write(",".join(img_array))
+                    f.write("\n")
+                    del img_array
+                    i += 1
+                    t.update()
+            t.close()
 
 
 def check_all_same_resolution():
