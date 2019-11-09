@@ -133,4 +133,7 @@ augmented/
 test_images/
 
 #extensions
-.json
+*.json
+*.pdf
+*.jpg
+*.csv
