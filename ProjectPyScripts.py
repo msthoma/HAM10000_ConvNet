@@ -17,6 +17,7 @@ dx_list = ["akiec", "bcc", "bkl", "df", "nv", "vasc", "mel"]
 dir_with_all_HAM_imgs = "/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images"
 metadata_csv_filename = "HAM10000_metadata.csv"
 output_csv_filename = "edited.csv"
+resized_img_side_dim = 28
 
 
 def get_count_dict():
@@ -31,7 +32,7 @@ def crop_square(img_array):
 
 
 def resize(img_array, side=28):
-    return cv2.resize(img_array, (side, side), interpolation=cv2.INTER_AREA)
+    return cv2.resize(img_array, (resized_img_side_dim, resized_img_side_dim), interpolation=cv2.INTER_AREA)
 
 
 def squish(img_array):
