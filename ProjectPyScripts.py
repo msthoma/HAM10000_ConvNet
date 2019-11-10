@@ -16,24 +16,6 @@ dx_list = ["akiec", "bcc", "bkl", "df", "nv", "vasc", "mel"]
 ham_dir = "/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images"
 
 
-def create_lookup_dict():
-    """ creates dict for easier image label lookup """
-    metadata = pd.read_csv("HAM10000_metadata.csv")
-    metadata["dx_int"] = metadata["dx"].map(dx_ints)
-    lookup_dict = metadata.loc[:, ["image_id", "dx_int"]].set_index("image_id")["dx_int"].to_dict()
-    with open("lookup_dict.json", "w+") as f:
-        json.dump(lookup_dict, f, indent=4)
-    count_dict = metadata.groupby(["dx"]).size().reset_index().rename(columns={0: 'count'}).set_index("dx")[
-        "count"].to_dict()
-    with open("count_dict.json", "w+") as g:
-        json.dump(count_dict, g, indent=4)
-
-
-def get_lookup_dict():
-    with open("lookup_dict.json", "r") as f:
-        return json.load(f)
-
-
 def get_count_dict():
     with open("count_dict.json", "r") as f:
         return json.load(f)
@@ -60,7 +42,6 @@ def grayscale(img_array):
 def process_and_augment_dataset():
     metadata = pd.read_csv("HAM10000_metadata.csv")
     count_dict = get_count_dict()
-    lookup_dict = get_lookup_dict()
     target_no_imgs_per_dx = 3000
 
     # augment each dx separately
