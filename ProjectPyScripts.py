@@ -45,7 +45,7 @@ def process_and_augment_dataset():
     target_no_imgs_per_dx = 3000
 
     # augment each dx separately
-    for dx in dx_list[:2]:
+    for dx in dx_list:
         img_count = 0
         pass_count = 0
 
