@@ -16,8 +16,8 @@ dx_list = ["akiec", "bcc", "bkl", "df", "nv", "vasc", "mel"]
 # other necessary information
 dir_with_all_HAM_imgs = "/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images"
 metadata_csv_filename = "HAM10000_metadata.csv"
-img_side_dim = 28
-target_no_imgs_per_dx = 3000
+img_side_dim = 64
+target_no_imgs_per_dx = 2000
 output_csv_filename = f"hmnist_{img_side_dim}_{img_side_dim}_{target_no_imgs_per_dx}.csv"
 
 
@@ -144,6 +144,14 @@ def process_and_augment_dataset():
             t.close()
 
 
+def edit_csv_as_original():
+    df = pd.read_csv(output_csv_filename, low_memory=False)
+    df.drop(["image_id", "transformations"], 1, inplace=True)
+    print(df.head(10))
+    filename, ext = output_csv_filename.split(".")
+    df.to_csv(f"{filename}_edit.{ext}", index=False)
+
+
 def check_all_same_resolution():
     # imgs = glob.glob("test_images/*.jpg")
     imgs = glob.glob("/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images_part_2/*.jpg")
@@ -169,7 +177,8 @@ def import_images():
 
 
 def main():
-    process_and_augment_dataset()
+    # process_and_augment_dataset()
+    edit_csv_as_original()
 
 
 if __name__ == '__main__':
