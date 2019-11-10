@@ -16,8 +16,9 @@ dx_list = ["akiec", "bcc", "bkl", "df", "nv", "vasc", "mel"]
 # other necessary information
 dir_with_all_HAM_imgs = "/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images"
 metadata_csv_filename = "HAM10000_metadata.csv"
-output_csv_filename = "edited.csv"
-resized_img_side_dim = 28
+img_side_dim = 28
+target_no_imgs_per_dx = 3000
+output_csv_filename = f"hmnist_{img_side_dim}_{img_side_dim}_{target_no_imgs_per_dx}.csv"
 
 
 def get_count_dict():
@@ -32,7 +33,7 @@ def crop_square(img_array):
 
 
 def resize(img_array, side=28):
-    return cv2.resize(img_array, (resized_img_side_dim, resized_img_side_dim), interpolation=cv2.INTER_AREA)
+    return cv2.resize(img_array, (img_side_dim, img_side_dim), interpolation=cv2.INTER_AREA)
 
 
 def squish(img_array):
@@ -46,7 +47,6 @@ def grayscale(img_array):
 def process_and_augment_dataset():
     metadata = pd.read_csv(metadata_csv_filename)
     count_dict = get_count_dict()
-    target_no_imgs_per_dx = 3000
 
     # augment each dx separately
     for dx in dx_list:
@@ -68,7 +68,7 @@ def process_and_augment_dataset():
             t.set_description(f"Transforming {dx} images")
 
             # write header
-            cols = [f"pixel{i:04d}" for i in range(resized_img_side_dim ** 2)]
+            cols = [f"pixel{i:04d}" for i in range(img_side_dim ** 2)]
             cols.extend(["image_id", "label", "transformations"])
             f.write(",".join(cols))
             f.write("\n")
