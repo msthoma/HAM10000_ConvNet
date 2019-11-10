@@ -113,6 +113,7 @@ def process_and_augment_dataset():
             t = tqdm(total=total)
             t.set_description(f"Squishing {dx} images")
             for index, row in metadata_filtered.iterrows():
+                # TODO move this and next to new def
                 img_id = row["image_id"]
                 assert row["dx"] == dx
                 img_path = os.path.join(ham_dir, f"{img_id}.jpg")
@@ -132,11 +133,17 @@ def process_and_augment_dataset():
                 i += 1
                 t.update()
 
-            if i < target_no_imgs_per_dx:
-                # second pass: crop square at random
-                t.set_description(f"Randomly cropping {dx} images")
-                for index, row in metadata_filtered.iterrows():
-                    if i > target_no_imgs_per_dx:
+            # second pass: crop square at random, and rotate/mirror at random
+            # continues doing so until required number of images is reached
+            j = 1
+            while i < total:
+                # update process bar description
+                t.set_description(f"Randomly cropping {dx} images ({j}x)")
+                # shuffle df
+                metadata_filtered_shuffled = metadata_filtered.sample(frac=1)
+                # iterate over imgs and transform
+                for index, row in metadata_filtered_shuffled.iterrows():
+                    if i >= total:
                         break
 
                     img_id = row["image_id"]
@@ -157,6 +164,7 @@ def process_and_augment_dataset():
                     del img_array
                     i += 1
                     t.update()
+                j += 1
             t.close()
 
 
