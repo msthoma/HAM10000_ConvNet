@@ -67,12 +67,6 @@ def process_and_augment_dataset():
             t = tqdm(total=total)
             t.set_description(f"Transforming {dx} images")
 
-            # write header
-            cols = [f"pixel{i:04d}" for i in range(img_side_dim ** 2)]
-            cols.extend(["image_id", "label", "transformations"])
-            f.write(",".join(cols))
-            f.write("\n")
-
             # repeat loop until desired number of imgs is reached
             while img_count < total:
                 # update progress bar
@@ -145,9 +139,14 @@ def process_and_augment_dataset():
 
 
 def edit_csv_as_original():
-    df = pd.read_csv(output_csv_filename, low_memory=False)
+    # create header
+    cols = [f"pixel{i:04d}" for i in range(img_side_dim ** 2)]
+    cols.extend(["image_id", "label", "transformations"])
+    # read file
+    df = pd.read_csv(output_csv_filename, header=None, names=cols, low_memory=False)
+    # drop unnecessary columns
     df.drop(["image_id", "transformations"], 1, inplace=True)
-    print(df.head(10))
+    # write to new csv file
     filename, ext = output_csv_filename.split(".")
     df.to_csv(f"{filename}_edit.{ext}", index=False)
 
