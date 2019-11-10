@@ -57,38 +57,6 @@ def grayscale(img_array):
     return cv2.cvtColor(img_array, cv2.COLOR_BGR2GRAY)
 
 
-def crop_all_to_squares():
-    imgs = glob.glob("/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images_part_2/*.jpg")
-
-    metadata = pd.read_csv("HAM10000_metadata.csv")
-
-    # print(os.path.join(os.getcwd(), im_name + ext))
-    # im = cv2.imread(imgs[2223])
-
-    # resize all
-    # crop all
-    # then run all rotations
-    # repeat until required number per cat is reached
-
-    imgs_flat_array = []
-
-    for im in imgs:
-        # read image
-        im_array = cv2.imread(im)
-
-        # create transformed image file path
-        im_filename = os.path.basename(im)
-        # im_name, ext = os.path.splitext(im_filename)
-        # filepath = os.path.join(os.getcwd(), "augmented", "".join([im_name, "crop", ext]))
-        #
-        # cv2.imwrite(filepath, resize(crop_square(grayscale(im_array))))
-        imgs_flat_array.append(np.ravel(resize(crop_square(grayscale(im_array)))))
-
-    df = pd.DataFrame(imgs_flat_array)
-    print(df.shape)
-    df.to_csv("extracted.csv", index=False)
-
-
 def process_and_augment_dataset():
     metadata = pd.read_csv("HAM10000_metadata.csv")
     count_dict = get_count_dict()
@@ -190,15 +158,6 @@ def check_all_same_resolution():
     imgs = glob.glob("/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images_part_2/*.jpg")
     sizes = any(sum(cv2.imread(im).shape) != 1053 for im in imgs)
     print(sizes)
-    # im = cv2.imread("test_images/ISIC_0024313.jpg")
-    # print(im.shape)
-    # cv2.imshow("lesion", im)
-
-    # shape = (im.shape[1], im.shape[0])
-    #
-    # matrix = cv2.getRotationMatrix2D(center=(450 / 2, 600 / 2), angle=90, scale=1)
-    # image = cv2.warpAffine(src=im, M=matrix, dsize=shape)
-    # cv2.imwrite('ISIC_0024313R.jpg', image)
 
 
 def gallery(array, ncols=10):
@@ -219,16 +178,6 @@ def import_images():
 
 
 def main():
-    # array = import_images()
-    # result = gallery(array)
-    # plt.imshow(result)
-    # plt.savefig("image_grid.pdf")
-    # plt.close()
-    # check_all_same_resolution()
-    # print(cv2.getBuildInformation())
-    # crop_all_to_squares()
-    # cv2.imwrite("squished.jpg", squish(cv2.imread("test_images/ISIC_0024306.jpg")))
-    # create_lookup_dict()
     process_and_augment_dataset()
 
 
