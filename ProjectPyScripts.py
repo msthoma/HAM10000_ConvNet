@@ -13,7 +13,10 @@ from tqdm import tqdm
 dx_ints = {"akiec": 0, "bcc": 1, "bkl": 2, "df": 3, "nv": 4, "vasc": 5, "mel": 6}
 dx_list = ["akiec", "bcc", "bkl", "df", "nv", "vasc", "mel"]
 
-ham_dir = "/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images"
+# other necessary information
+dir_with_all_HAM_imgs = "/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images"
+metadata_csv_filename = "HAM10000_metadata.csv"
+output_csv_filename = "edited.csv"
 
 
 def get_count_dict():
@@ -40,7 +43,7 @@ def grayscale(img_array):
 
 
 def process_and_augment_dataset():
-    metadata = pd.read_csv("HAM10000_metadata.csv")
+    metadata = pd.read_csv(metadata_csv_filename)
     count_dict = get_count_dict()
     target_no_imgs_per_dx = 3000
 
@@ -58,7 +61,7 @@ def process_and_augment_dataset():
         else:
             total = target_no_imgs_per_dx
 
-        with open("edited.csv", "a+") as f:
+        with open(output_csv_filename, "a+") as f:
             # set up progress bar
             t = tqdm(total=total)
             t.set_description(f"Transforming {dx} images")
@@ -84,7 +87,7 @@ def process_and_augment_dataset():
                     assert row["dx"] == dx
 
                     # read images
-                    img_path = os.path.join(ham_dir, f"{img_id}.jpg")
+                    img_path = os.path.join(dir_with_all_HAM_imgs, f"{img_id}.jpg")
                     img_array = cv2.imread(img_path)
 
                     # convert to grayscale
