@@ -67,6 +67,12 @@ def process_and_augment_dataset():
             t = tqdm(total=total)
             t.set_description(f"Transforming {dx} images")
 
+            # write header
+            cols = [f"pixel{i:04d}" for i in range(resized_img_side_dim ** 2)]
+            cols.extend(["image_id", "label", "transformations"])
+            f.write(",".join(cols))
+            f.write("\n")
+
             # repeat loop until desired number of imgs is reached
             while img_count < total:
                 # update progress bar
