@@ -1,16 +1,13 @@
 import glob
-
-import os
 import json
-import cv2
-import time
-from tqdm import tqdm
-import matplotlib.pyplot as plt
-import pandas as pd
-import numpy as np
-from PIL import Image
+import os
 from random import randint
-import tensorflow as tf
+
+import cv2
+import numpy as np
+import pandas as pd
+from PIL import Image
+from tqdm import tqdm
 
 # df lists
 dx_ints = {"akiec": 0, "bcc": 1, "bkl": 2, "df": 3, "nv": 4, "vasc": 5, "mel": 6}
@@ -48,7 +45,7 @@ def crop_square(img_array):
     return img_array[:, left_crop:-right_crop]
 
 
-def resize(img_array, side=96):
+def resize(img_array, side=28):
     return cv2.resize(img_array, (side, side), interpolation=cv2.INTER_AREA)
 
 
@@ -100,71 +97,91 @@ def process_and_augment_dataset():
 
     # augment each dx separately
     for dx in dx_list[:2]:
-        i = 0
+        img_count = 0
+        pass_count = 0
+
+        # filter data for current dx
         metadata_filtered = metadata[metadata["dx"] == dx]
 
+        # if dx count is larger that target, keep that count
         if count_dict[dx] > target_no_imgs_per_dx:
             total = count_dict[dx]
         else:
             total = target_no_imgs_per_dx
 
         with open("edited.csv", "a+") as f:
-            # first pass: squish all
+            # set up progress bar
             t = tqdm(total=total)
-            t.set_description(f"Squishing {dx} images")
-            for index, row in metadata_filtered.iterrows():
-                # TODO move this and next to new def
-                img_id = row["image_id"]
-                assert row["dx"] == dx
-                img_path = os.path.join(ham_dir, f"{img_id}.jpg")
+            t.set_description(f"Transforming {dx} images")
 
-                # read and squish images
-                img_array = cv2.imread(img_path)
-                img_array = np.ravel(resize(squish(grayscale(img_array))))
+            # repeat loop until desired number of imgs is reached
+            while img_count < total:
+                # update progress bar
+                if pass_count == 0:
+                    t.set_postfix_str("Squishing images")
+                else:
+                    t.set_postfix_str(f"Randomly cropping/rotating/flipping images ({pass_count}x)")
 
-                # append img_id and dx as int
-                img_array = np.append(img_array, [img_id])
-                img_array = np.append(img_array, [dx_ints[dx]])
-
-                # append to final to file
-                f.write(",".join(img_array))
-                f.write("\n")
-                del img_array
-                i += 1
-                t.update()
-
-            # second pass: crop square at random, and rotate/mirror at random
-            # continues doing so until required number of images is reached
-            j = 1
-            while i < total:
-                # update process bar description
-                t.set_description(f"Randomly cropping {dx} images ({j}x)")
                 # shuffle df
                 metadata_filtered_shuffled = metadata_filtered.sample(frac=1)
+
                 # iterate over imgs and transform
                 for index, row in metadata_filtered_shuffled.iterrows():
-                    if i >= total:
+                    # stop if desired number is reached
+                    if img_count >= total:
                         break
 
                     img_id = row["image_id"]
                     assert row["dx"] == dx
+
+                    # read images
                     img_path = os.path.join(ham_dir, f"{img_id}.jpg")
-
-                    # read and squish images
                     img_array = cv2.imread(img_path)
-                    img_array = np.ravel(resize(crop_square(grayscale(img_array))))
 
-                    # append img_id and dx as int
+                    # convert to grayscale
+                    img_array = grayscale(img_array)
+
+                    # keep record of the transformations applied
+                    applied_transf = []
+
+                    # apply transformations
+                    if pass_count == 0:
+                        # first pass: squish all
+                        img_array = squish(img_array)
+                        applied_transf.append("sq")
+                    else:
+                        # second and subsequent passes: first crop square
+                        img_array = crop_square(img_array)
+                        applied_transf.append("cr")
+
+                        # randomly rotate in multiples of 90 (or not)
+                        rotate = randint(0, 3)
+                        img_array = np.rot90(img_array, rotate)
+                        applied_transf.append(f"r{rotate}")
+
+                        # flip/mirror (or not)
+                        flip = randint(0, 1)
+                        if flip == 1:
+                            img_array = np.fliplr(img_array)
+                        applied_transf.append(f"f{flip}")
+
+                    # resize and flatten array, for appending to csv
+                    img_array = np.ravel(resize(img_array))
+
+                    # append img_id, dx as int, and applied transformations
                     img_array = np.append(img_array, [img_id])
                     img_array = np.append(img_array, [dx_ints[dx]])
+                    img_array = np.append(img_array, ["-".join(applied_transf)])
 
                     # append to final to file
                     f.write(",".join(img_array))
                     f.write("\n")
                     del img_array
-                    i += 1
+                    img_count += 1
                     t.update()
-                j += 1
+
+                pass_count += 1
+
             t.close()
 
 
