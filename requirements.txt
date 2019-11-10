@@ -1,3 +1,4 @@
+opencv-python
 absl-py==0.8.0
 arrow==0.13.0
 astor==0.8.0
