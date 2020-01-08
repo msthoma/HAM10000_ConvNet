@@ -16,7 +16,7 @@ dx_list = ["akiec", "bcc", "bkl", "df", "nv", "vasc", "mel"]
 # other necessary information
 dir_with_all_HAM_imgs = "/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images"
 metadata_csv_filename = "HAM10000_metadata.csv"
-img_side_dim = 64
+img_side_dim = 42
 target_no_imgs_per_dx = 2000
 output_csv_filename = f"hmnist_{img_side_dim}_{img_side_dim}_{target_no_imgs_per_dx}.csv"
 
@@ -176,7 +176,7 @@ def import_images():
 
 
 def main():
-    # process_and_augment_dataset()
+    process_and_augment_dataset()
     edit_csv_as_original()
 
 
