@@ -152,7 +152,6 @@ def edit_csv_as_original():
 
 
 def check_all_same_resolution():
-    # imgs = glob.glob("test_images/*.jpg")
     imgs = glob.glob("/home/marios/Downloads/skin-cancer-mnist-ham10000/ham10000_images_part_2/*.jpg")
     sizes = any(sum(cv2.imread(im).shape) != 1053 for im in imgs)
     print(sizes)
