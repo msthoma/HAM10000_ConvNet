@@ -7,7 +7,7 @@ attrs==19.3.0
 b2==1.4.0
 b2sdk==0.1.8
 backcall==0.1.0
-bleach==3.1.1
+bleach==3.1.4
 certifi==2019.9.11
 cycler==0.10.0
 decorator==4.4.1
