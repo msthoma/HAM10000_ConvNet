@@ -23,4 +23,4 @@ All networks were trained for 30 epochs. The table below summarises the results:
 
 Additionally, the figure below shows the training histories, outcomes and confusion matrices for all networks: 
 
-![Part 2](figure_Q7_convNet_graphs.svg) 
+![Part 2](figure_convNetRes.svg) 
