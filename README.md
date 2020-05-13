@@ -1,6 +1,6 @@
 Convolutional neural network based on the skin lesion image data set [HAM10000](https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/DBW86T). 
 
-Created as part of Project 2 for module COS624 ([Cognitive Systems M.Sc.](https://www.ouc.ac.cy/web/guest/s2/programme/cos/)). 
+Created as part of Project 2 for module COS624 ([Cognitive Systems M.Sc.](https://www.ouc.ac.cy/index.php/en/studies/programs/master/cos)). 
 
 ## Results
 I trained 5 versions of the ConvNet, using 5 different data sets:
