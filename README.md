@@ -11,6 +11,16 @@ I trained 5 versions of the ConvNet, using 5 different data sets:
 4.   Data set with 42x42 images, that I created, with augmented lesion types to 2000 per category. 
 5.   Data set with 64x64 images, that I created, with augmented lesion types to 2000 per category.
 
-The networks were all trained for 30 epochs. The graph below summarises the results. 
+All networks were trained for 30 epochs. The table below summarises the results:
+
+|                     |   Test accuracy |   Test loss | Training time   |   Epochs |
+|:--------------------|----------------:|------------:|:----------------|---------:|
+| 8x8 (as provided)   |        0.710934 |    0.86682  | 0:00:49         |       30 |
+| 28x28 (as provided) |        0.729905 |    0.785197 | 0:06:07         |       30 |
+| 28x28 (augmented)   |        0.62069  |    0.999897 | 0:11:25         |       30 |
+| 42x42 (augmented)   |        0.659984 |    0.944596 | 0:25:51         |       30 |
+| 64x64 (augmented)   |        0.652767 |    1.10109  | 0:54:19         |       30 |
+
+Additionally, the figure below shows the training histories, outcomes and confusion matrices for all networks: 
 
 ![Part 2](figure_Q7_convNet_graphs.svg) 
