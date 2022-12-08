@@ -8,7 +8,7 @@ b2==3.2.1
 b2sdk==1.14.1
 backcall==0.1.0
 bleach==3.3.0
-certifi==2019.9.11
+certifi==2022.12.7
 cycler==0.10.0
 decorator==4.4.1
 defusedxml==0.6.0
